@@ -25,6 +25,26 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+
+    const classCollection = client.db("summerCamp").collection("classes");
+    const instructorCollection = client
+      .db("summerCamp")
+      .collection("instructors");
+
+    // classes api
+    app.get("/classes", async (req, res) => {
+      const limit = parseInt(req.query.limit);
+      const result = await classCollection.find().limit(limit).toArray();
+      res.send(result);
+    });
+
+    // instructors api
+    app.get("/instructors", async (req, res) => {
+      const limit = parseInt(req.query.limit);
+      const result = await instructorCollection.find().limit(limit).toArray();
+      res.send(result);
+    });
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log(
