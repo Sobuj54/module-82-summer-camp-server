@@ -63,6 +63,16 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/users/:email", async (req, res) => {
+      const email = req.params.email;
+      const query = { email: email };
+      const options = {
+        projection: { _id: 0, name: 1, email: 1, photoURL: 1, role: 1 },
+      };
+      const result = await userCollection.findOne(query, options);
+      res.send(result);
+    });
+
     app.patch("/users", async (req, res) => {
       const updatedRole = req.body;
       const filter = { _id: new ObjectId(updatedRole.id) };
