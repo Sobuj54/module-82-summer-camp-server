@@ -30,6 +30,7 @@ async function run() {
     const instructorCollection = client
       .db("summerCamp")
       .collection("instructors");
+    const userCollection = client.db("summerCamp").collection("users");
 
     // classes api
     app.get("/classes", async (req, res) => {
@@ -42,6 +43,13 @@ async function run() {
     app.get("/instructors", async (req, res) => {
       const limit = parseInt(req.query.limit);
       const result = await instructorCollection.find().limit(limit).toArray();
+      res.send(result);
+    });
+
+    // users api
+    app.post("/users", async (req, res) => {
+      const userInfo = req.body;
+      const result = await userCollection.insertOne(userInfo);
       res.send(result);
     });
 
