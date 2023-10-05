@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require("dotenv").config();
+const jwt = require("jsonwebtoken");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const port = process.env.PORT || 5000;
 
@@ -32,6 +33,16 @@ async function run() {
       .collection("instructors");
     const userCollection = client.db("summerCamp").collection("users");
 
+    // jwt token
+    app.post("/jwt", (req, res) => {
+      const user = req.body;
+      console.log(user);
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN, {
+        expiresIn: "1h",
+      });
+      res.send({ token });
+    });
+
     // classes api
     app.get("/classes", async (req, res) => {
       const limit = parseInt(req.query.limit);
@@ -52,7 +63,7 @@ async function run() {
       const query = { email: userInfo.email };
       const userExists = await userCollection.findOne(query);
       if (userExists) {
-        return res.send({ message: "user already exists" });
+        return;
       }
       const result = await userCollection.insertOne(userInfo);
       res.send(result);
