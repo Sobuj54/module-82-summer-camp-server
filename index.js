@@ -72,9 +72,21 @@ async function run() {
     });
 
     // enrolled class api
-    app.post("/classes/enrolled", async (req, res) => {
+    app.post("/classes/enrolled", verifyJWT, async (req, res) => {
       const enrolledClass = req.body;
       const result = await enrolledClassCollection.insertOne(enrolledClass);
+      res.send(result);
+    });
+
+    app.get("/classes/enrolled", verifyJWT, async (req, res) => {
+      const result = await enrolledClassCollection.find().toArray();
+      res.send(result);
+    });
+
+    app.delete("/classes/enrolled/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await enrolledClassCollection.deleteOne(query);
       res.send(result);
     });
 
