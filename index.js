@@ -47,6 +47,9 @@ async function run() {
     await client.connect();
 
     const classCollection = client.db("summerCamp").collection("classes");
+    const enrolledClassCollection = client
+      .db("summerCamp")
+      .collection("enrolledClasses");
     const instructorCollection = client
       .db("summerCamp")
       .collection("instructors");
@@ -65,6 +68,13 @@ async function run() {
     app.get("/classes", async (req, res) => {
       const limit = parseInt(req.query.limit);
       const result = await classCollection.find().limit(limit).toArray();
+      res.send(result);
+    });
+
+    // enrolled class api
+    app.post("/classes/enrolled", async (req, res) => {
+      const enrolledClass = req.body;
+      const result = await enrolledClassCollection.insertOne(enrolledClass);
       res.send(result);
     });
 
@@ -92,8 +102,18 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/users/:email", verifyJWT, async (req, res) => {
-      const email = req.params.email;
+    app.get("/users/role", verifyJWT, async (req, res) => {
+      const email = req.query.email;
+      const query = { email: email };
+      const options = {
+        projection: { _id: 0, role: 1 },
+      };
+      const result = await userCollection.findOne(query, options);
+      res.send(result);
+    });
+
+    app.get("/users/details", verifyJWT, async (req, res) => {
+      const email = req.query.email;
       const query = { email: email };
       const options = {
         projection: { _id: 0, name: 1, email: 1, photoURL: 1, role: 1 },
