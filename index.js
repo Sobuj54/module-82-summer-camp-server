@@ -64,10 +64,16 @@ async function run() {
       res.send({ token });
     });
 
-    // classes api
+    // sll classes api
     app.get("/classes", async (req, res) => {
       const limit = parseInt(req.query.limit);
       const result = await classCollection.find().limit(limit).toArray();
+      res.send(result);
+    });
+
+    app.post("/classes/addClass", verifyJWT, async (req, res) => {
+      const newClass = req.body;
+      const result = await classCollection.insertOne(newClass);
       res.send(result);
     });
 
