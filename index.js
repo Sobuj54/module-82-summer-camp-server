@@ -77,6 +77,13 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/classes/instructorClasses", verifyJWT, async (req, res) => {
+      const instructorEmail = req.query.email;
+      const query = { email: instructorEmail };
+      const result = await classCollection.find(query).toArray();
+      res.send(result);
+    });
+
     // enrolled class api
     app.post("/classes/enrolled", verifyJWT, async (req, res) => {
       const enrolledClass = req.body;
