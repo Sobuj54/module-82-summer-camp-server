@@ -102,6 +102,25 @@ async function run() {
       res.send(result);
     });
 
+    app.patch(
+      "/classes/allClasses",
+      verifyJWT,
+      verifyAdmin,
+      async (req, res) => {
+        const updatedStatus = req.body;
+        console.log(updatedStatus);
+        const { id, status } = updatedStatus;
+        const filter = { _id: new ObjectId(id) };
+        const updatedDoc = {
+          $set: {
+            status: status,
+          },
+        };
+        const result = await classCollection.updateOne(filter, updatedDoc);
+        res.send(result);
+      }
+    );
+
     app.post(
       "/classes/addClass",
       verifyJWT,
