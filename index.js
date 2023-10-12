@@ -77,6 +77,17 @@ async function run() {
       next();
     };
 
+    // verify Instructor
+    const verifyInstructor = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      if (user?.role !== "instructor") {
+        return res.status(403).send({ error: true, message: "forbidden" });
+      }
+      next();
+    };
+
     // sll classes api
     app.get("/classes", async (req, res) => {
       const limit = parseInt(req.query.limit);
@@ -84,11 +95,16 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/classes/addClass", verifyJWT, async (req, res) => {
-      const newClass = req.body;
-      const result = await classCollection.insertOne(newClass);
-      res.send(result);
-    });
+    app.post(
+      "/classes/addClass",
+      verifyJWT,
+      verifyInstructor,
+      async (req, res) => {
+        const newClass = req.body;
+        const result = await classCollection.insertOne(newClass);
+        res.send(result);
+      }
+    );
 
     app.get("/classes/instructorClasses", verifyJWT, async (req, res) => {
       const instructorEmail = req.query.email;
