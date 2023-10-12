@@ -91,6 +91,13 @@ async function run() {
     // sll classes api
     app.get("/classes", async (req, res) => {
       const limit = parseInt(req.query.limit);
+      const query = { status: "approved" };
+      const result = await classCollection.find(query).limit(limit).toArray();
+      res.send(result);
+    });
+
+    app.get("/classes/allClasses", verifyJWT, verifyAdmin, async (req, res) => {
+      const limit = parseInt(req.query.limit);
       const result = await classCollection.find().limit(limit).toArray();
       res.send(result);
     });
