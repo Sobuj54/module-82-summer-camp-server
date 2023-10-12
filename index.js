@@ -26,6 +26,8 @@ const verifyJWT = (req, res, next) => {
       res.status(403).send({ error: true, message: "unauthorized" });
     }
     req.decoded = decoded;
+    // console.log(req.decoded) will look something like this
+    // { email: 'sobujahmed124@gmail.com', iat: 1697119771, exp: 1697123371 }
     next();
   });
 };
@@ -63,6 +65,17 @@ async function run() {
       });
       res.send({ token });
     });
+
+    // verify admin
+    const verifyAdmin = async (req, res, next) => {
+      const email = req.decoded.email;
+      const query = { email: email };
+      const user = await userCollection.findOne(query);
+      if (user?.role !== "admin") {
+        return res.status(403).send({ error: true, message: "forbidden" });
+      }
+      next();
+    };
 
     // sll classes api
     app.get("/classes", async (req, res) => {
@@ -122,7 +135,7 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/users", async (req, res) => {
+    app.get("/users", verifyJWT, verifyAdmin, async (req, res) => {
       const result = await userCollection.find().toArray();
       res.send(result);
     });
