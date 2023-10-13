@@ -108,7 +108,6 @@ async function run() {
       verifyAdmin,
       async (req, res) => {
         const updatedStatus = req.body;
-        console.log(updatedStatus);
         const { id, status } = updatedStatus;
         const filter = { _id: new ObjectId(id) };
         const updatedDoc = {
@@ -117,6 +116,30 @@ async function run() {
           },
         };
         const result = await classCollection.updateOne(filter, updatedDoc);
+        res.send(result);
+      }
+    );
+
+    // admin feedback
+    app.put(
+      "/classes/feedback/:id",
+      verifyJWT,
+      verifyAdmin,
+      async (req, res) => {
+        const id = req.params.id;
+        const feedbackData = req.body;
+        const filter = { _id: new ObjectId(id) };
+        const options = { upset: true };
+        const updatedDoc = {
+          $set: {
+            Feedback: feedbackData,
+          },
+        };
+        const result = await classCollection.updateOne(
+          filter,
+          updatedDoc,
+          options
+        );
         res.send(result);
       }
     );
