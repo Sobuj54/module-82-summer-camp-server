@@ -179,7 +179,9 @@ async function run() {
     });
 
     app.get("/classes/enrolled", verifyJWT, async (req, res) => {
-      const result = await enrolledClassCollection.find().toArray();
+      const email = req.query.email;
+      const query = { userEmail: email };
+      const result = await enrolledClassCollection.find(query).toArray();
       res.send(result);
     });
 
