@@ -54,6 +54,7 @@ async function run() {
       .db("summerCamp")
       .collection("instructors");
     const userCollection = client.db("summerCamp").collection("users");
+    const paymentCollection = client.db("summerCamp").collection("payments");
 
     // jwt token
     app.post("/jwt", (req, res) => {
@@ -86,7 +87,7 @@ async function run() {
       next();
     };
 
-    // payment
+    // payment intent
     app.post("/create-payment-intent", verifyJWT, async (req, res) => {
       const { totalPrice } = req.body;
       const amount = totalPrice * 100;
@@ -101,7 +102,14 @@ async function run() {
       res.send({ clientSecret: paymentIntent.client_secret });
     });
 
-    // sll classes api
+    // payment info
+    app.post("/payments", verifyJWT, async (req, res) => {
+      const paymentDetails = req.body;
+      const result = await paymentCollection.insertOne(paymentDetails);
+      res.send(result);
+    });
+
+    // all classes api
     app.get("/classes", async (req, res) => {
       const limit = parseInt(req.query.limit);
       const query = { status: "approved" };
